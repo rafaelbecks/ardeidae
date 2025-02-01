@@ -2,15 +2,21 @@
   "name": "ardeidae",
   "version": "1.0.0",
   "description": "A Bluetooth HID & IMU aggregator for OSC-based interactions.",
-  "main": "ardeidae.js",
+  "main": "src/ardeidae.js",
+  "type": "module",
   "dependencies": {
     "@abandonware/noble": "^1.9.2-25",
     "node-hid": "^3.1.2",
-    "node-osc": "^9.1.4"
+    "node-osc": "^9.1.4",
+    "node-web-bluetooth": "^1.2.1"
   },
   "scripts": {
-      "start": "node ardeidae.js"
-    },
-    "author": "Rafael Becerra",
-    "license": "MIT"
+    "start": "node ardeidae.js",
+    "lint": "standard --fix"
+  },
+  "author": "Rafael Becerra",
+  "license": "MIT",
+  "devDependencies": {
+    "standard": "^17.1.2"
+  }
 }
