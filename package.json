@@ -11,12 +11,14 @@
     "node-web-bluetooth": "^1.2.1"
   },
   "scripts": {
-    "start": "node ardeidae.js",
+    "cli": "node ardeidae.js",
+    "ui": "electron src/electron/ui.js",
     "lint": "standard --fix"
   },
   "author": "Rafael Becerra",
   "license": "MIT",
   "devDependencies": {
+    "electron": "^34.0.2",
     "standard": "^17.1.2"
   }
 }
