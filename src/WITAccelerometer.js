@@ -56,7 +56,7 @@ class SelectFirstFoundDevice extends Bluetooth.RequestDeviceDelegate {
   onStartScan () {
     this._timer = setTimeout(() => {
       this.reject(new Error('No device found'))
-    }, 20000)
+    }, 10000)
   }
 
   onStopScan () {

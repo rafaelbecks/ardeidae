@@ -20,7 +20,7 @@ export default class RingDevice {
   }
 
   listenEvents () {
-    logger.info(this.productName, 'Listening to events...')
+    logger.info(this.productName, 'Ring connected. Listening to events...')
     this.device.on('data', (data) => {
       const buttonPressed = data.toString('hex')
       if (this.hexMappings[buttonPressed]) {
