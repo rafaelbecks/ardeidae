@@ -1,5 +1,8 @@
 import Bluetooth from 'node-web-bluetooth'
 import AccelerometerDataProcessor from './accelerometerDataProcessor.js'
+import logger from './logger.js'
+
+const logGroup = 'WITAccelerometer'
 
 export default class WITAccelerometer {
   constructor ({ config, oscClient }) {
@@ -8,7 +11,7 @@ export default class WITAccelerometer {
   }
 
   async connect () {
-    console.log('[WIT Accelerometer] Attepmting to connect...')
+    logger.info(logGroup, 'Attepmting to connect...')
     const device = await Bluetooth.requestDevice({
       filters: [
         { services: [this.config.targetServiceUuid] }
@@ -20,7 +23,7 @@ export default class WITAccelerometer {
     const service = await server.getPrimaryService(this.config.targetServiceUuid)
     const characteristics = await service.getCharacteristic(this.config.targetCharacteristicUuidRead)
     const dataProcessor = new AccelerometerDataProcessor(this.oscClient)
-    console.log('[WIT Accelerometer] Connected, reading data.. ')
+    logger.info(logGroup, 'Connected, reading data.. ')
     await characteristics.startNotifications()
 
     characteristics.on('characteristicvaluechanged', (data) => {
@@ -29,15 +32,19 @@ export default class WITAccelerometer {
       dataProcessor.onDataReceived(rawData)
     })
 
-    process.on('SIGINT', async () => {
-      console.log('\n[WIT Accelerometer] Disconnecting Bluetooth device...')
+    // process.on('SIGINT', async () => {
+    //   logger.info(logGroup, 'Disconnecting Bluetooth device...')
 
-      await characteristics.stopNotifications()
-      await server.disconnect()
-      console.log('[WIT Accelerometer] Device disconnected.')
+    //   await characteristics.stopNotifications()
+    //   await server.disconnect()
+    //   logger.info(logGroup, 'Device disconnected.')
+    //   process.exit(9)
 
-      process.exit()
-    })
+    //   try{
+    //   } catch (err) {
+    //     console.log(err)
+    //   }
+    // })
   }
 }
 

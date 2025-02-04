@@ -1,16 +1,16 @@
 import path from 'node:path'
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { app, BrowserWindow } from 'electron'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
+import { app, BrowserWindow, ipcMain } from 'electron'
+
 import OSCClient from '../OSCClient.js'
-import config from '../config.js';
+import config from '../config.js'
+import logger from '../logger.js'
 import WITAccelerometer from '../WITAccelerometer.js'
+import RingDevice from '../ringDevice.js'
 
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-console.log('__dirname', __dirname)
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const createWindow = async () => {
   const win = new BrowserWindow({
@@ -19,20 +19,32 @@ const createWindow = async () => {
     },
     width: 1024,
     height: 856,
+    resizable: false,
     titleBarStyle: 'hiddenInset',
     contextIsolation: true,
     enableBlinkFeatures: 'Bluetooth'
   })
 
-  const onOSCMessage = ({ address, value}) => {
+  const onOSCMessage = ({ address, value }) => {
     win.webContents.send('osc-message', { address, value })
   }
 
-  const oscClient = new OSCClient(config.osc.host, config.osc.port, onOSCMessage)
-  const witAccelerometer = new WITAccelerometer({ config: config.ble, oscClient })
+
+  logger.init([
+    { transport: console.log, level: 'debug' },
+    { transport: (log) => win.webContents.send('log-entry', log), level: 'info' }
+  ])
 
   win.loadURL('http://localhost:8000/')
-  await witAccelerometer.connect()
+
+  ipcMain.on('start-sensors', async () => {
+    const oscClient = new OSCClient(config.osc.host, config.osc.port, onOSCMessage)
+    const witAccelerometer = new WITAccelerometer({ config: config.ble, oscClient })
+    const ring = new RingDevice({ config: config.ring, oscClient })
+    ring.initDevice()
+    await witAccelerometer.connect()
+  })
+
 
 }
 

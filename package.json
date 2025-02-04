@@ -12,7 +12,7 @@
   },
   "scripts": {
     "cli": "node ardeidae.js",
-    "ui": "electron src/electron/ui.js",
+    "ui": "electron src/electron/ui.js --disable-http-cache",
     "lint": "standard --fix"
   },
   "author": "Rafael Becerra",
