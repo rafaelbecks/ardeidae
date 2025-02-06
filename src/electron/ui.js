@@ -31,21 +31,26 @@ const createWindow = async () => {
 
 
   logger.init([
-    { transport: console.log, level: 'debug' },
+    { transport: console.log, level: 'info' },
     { transport: (log) => win.webContents.send('log-entry', log), level: 'info' }
   ])
 
   win.loadURL('http://localhost:8000/')
 
+  let witAccelerometer
+
   ipcMain.on('start-sensors', async () => {
     const oscClient = new OSCClient(config.osc.host, config.osc.port, onOSCMessage)
-    const witAccelerometer = new WITAccelerometer({ config: config.ble, oscClient })
+    witAccelerometer = new WITAccelerometer({ config: config.ble, oscClient })
     const ring = new RingDevice({ config: config.ring, oscClient })
     ring.initDevice()
     await witAccelerometer.connect()
   })
 
-
+  ipcMain.on('set-offset-coordinates', (_, coordinates) => {
+    logger.info(`Setting offset coordinates: ${JSON.stringify(coordinates)}`)
+    witAccelerometer.setOffsetCoordinates(coordinates)
+  })
 }
 
 app.whenReady().then(() => {

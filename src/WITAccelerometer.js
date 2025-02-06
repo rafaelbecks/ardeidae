@@ -5,9 +5,16 @@ import logger from './logger.js'
 const logGroup = 'WITAccelerometer'
 
 export default class WITAccelerometer {
+
+  offsetCoordinates = { x: 0, y: 0, z: 0 }
+
   constructor ({ config, oscClient }) {
     this.config = config
     this.oscClient = oscClient
+  }
+
+  setOffsetCoordinates(coordinates){
+    this.offsetCoordinates = coordinates
   }
 
   async connect () {
@@ -29,7 +36,7 @@ export default class WITAccelerometer {
     characteristics.on('characteristicvaluechanged', (data) => {
       const value = data.target._value
       const rawData = new Uint8Array(value.buffer)
-      dataProcessor.onDataReceived(rawData)
+      dataProcessor.onDataReceived(rawData, this.offsetCoordinates)
     })
 
     // process.on('SIGINT', async () => {
