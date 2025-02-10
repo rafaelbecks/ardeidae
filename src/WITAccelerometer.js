@@ -19,25 +19,30 @@ export default class WITAccelerometer {
 
   async connect () {
     logger.info(logGroup, 'Attepmting to connect...')
-    const device = await Bluetooth.requestDevice({
-      filters: [
-        { services: [this.config.targetServiceUuid] }
-      ],
-      delegate: new SelectFirstFoundDevice()
-    })
 
-    const server = await device.gatt.connect()
-    const service = await server.getPrimaryService(this.config.targetServiceUuid)
-    const characteristics = await service.getCharacteristic(this.config.targetCharacteristicUuidRead)
-    const dataProcessor = new AccelerometerDataProcessor(this.oscClient)
-    logger.info(logGroup, 'Connected, reading data.. ')
-    await characteristics.startNotifications()
+    try{
+      const device = await Bluetooth.requestDevice({
+        filters: [
+          { services: [this.config.targetServiceUuid] }
+        ],
+        delegate: new SelectFirstFoundDevice()
+      })
 
-    characteristics.on('characteristicvaluechanged', (data) => {
-      const value = data.target._value
-      const rawData = new Uint8Array(value.buffer)
-      dataProcessor.onDataReceived(rawData, this.offsetCoordinates)
-    })
+      const server = await device.gatt.connect()
+      const service = await server.getPrimaryService(this.config.targetServiceUuid)
+      const characteristics = await service.getCharacteristic(this.config.targetCharacteristicUuidRead)
+      const dataProcessor = new AccelerometerDataProcessor(this.oscClient)
+      logger.info(logGroup, 'Connected, reading data.. ')
+      await characteristics.startNotifications()
+
+      characteristics.on('characteristicvaluechanged', (data) => {
+        const value = data.target._value
+        const rawData = new Uint8Array(value.buffer)
+        dataProcessor.onDataReceived(rawData, this.offsetCoordinates)
+      })
+    } catch(error){
+      logger.error("Device not available")
+    }
 
     // process.on('SIGINT', async () => {
     //   logger.info(logGroup, 'Disconnecting Bluetooth device...')

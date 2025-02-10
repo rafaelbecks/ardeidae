@@ -12,12 +12,14 @@
   },
   "scripts": {
     "cli": "node ardeidae.js",
-    "ui": "electron src/electron/ui.js --disable-http-cache",
+    "ui:local": "NODE_ENV=local concurrently --names \"UI,BACKEND\" -c \"blue.bold,green.bold\" \"cd ../ardeidae-ui && npm start\" \"electron src/electron/ui.js --disable-http-cache\"",
+    "ui:remote": "NODE_ENV=prod concurrently --names \"BACKEND\" -c \"green.bold\"  \"electron src/electron/ui.js --disable-http-cache\"",
     "lint": "standard --fix"
   },
   "author": "Rafael Becerra",
   "license": "MIT",
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "electron": "^34.0.2",
     "standard": "^17.1.2"
   }
