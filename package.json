@@ -11,7 +11,7 @@
     "node-web-bluetooth": "^1.2.1"
   },
   "scripts": {
-    "cli": "node ardeidae.js",
+    "cli": "node src/ardeidae.js",
     "ui:local": "NODE_ENV=local concurrently --names \"UI,BACKEND\" -c \"blue.bold,green.bold\" \"cd ../ardeidae-ui && npm start\" \"electron src/electron/ui.js --disable-http-cache\"",
     "ui:remote": "NODE_ENV=prod concurrently --names \"BACKEND\" -c \"green.bold\"  \"electron src/electron/ui.js --disable-http-cache\"",
     "lint": "standard --fix"
